@@ -3,13 +3,6 @@ pipeline {
 
     stages {
 
-        stage('Checkout') {
-            steps {
-                echo 'Checking out source code...'
-                checkout scm
-            }
-        }
-
         stage('Install Dependencies') {
             steps {
                 echo 'Installing Node.js dependencies...'
@@ -27,7 +20,6 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 echo 'Building Docker image...'
-
                 bat 'docker build -t dhruvddu/node-products-api:latest .'
             }
         }
@@ -53,7 +45,6 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 echo 'Pushing Docker image to Docker Hub...'
-
                 bat 'docker push dhruvddu/node-products-api:latest'
             }
         }
@@ -73,7 +64,16 @@ pipeline {
             steps {
                 echo 'Verifying Product API...'
 
-                bat 'curl http://localhost:3000/products'
+                bat '''
+                for /L %%i in (1,1,10) do (
+                    curl --fail http://localhost:3000/products && exit /B 0
+                    echo API not ready, retrying...
+                    timeout /t 2 /nobreak >NUL
+                )
+
+                echo API failed to become ready
+                exit /B 1
+                '''
             }
         }
     }
