@@ -61,21 +61,15 @@ pipeline {
         }
 
         stage('Verify API') {
-            steps {
-                echo 'Verifying Product API...'
+    steps {
+        echo 'Waiting for Product API...'
 
-                bat '''
-                for /L %%i in (1,1,10) do (
-                    curl --fail http://localhost:3000/products && exit /B 0
-                    echo API not ready, retrying...
-                    timeout /t 2 /nobreak >NUL
-                )
-
-                echo API failed to become ready
-                exit /B 1
-                '''
-            }
-        }
+        bat '''
+        timeout /t 5 /nobreak >NUL
+        curl --fail http://localhost:3000/products
+        '''
+    }
+}
     }
 
     post {
