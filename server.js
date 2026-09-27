@@ -29,7 +29,7 @@ const products = [
 
 app.get("/", (req, res) => {
     res.json({
-        message: "Product API is running"
+        message: "Product API is running successfully through Jenkins CI/CD"
     });
 });
 
